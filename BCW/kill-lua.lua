@@ -11,7 +11,7 @@ coroutine.wrap(function()
             if v:FindFirstChild("EnemyMain") then       
                 local humanoid = v:WaitForChild("Humanoid")
                 local Part = v:WaitForChild("HumanoidRootPart")	
-                -- This while loop is checking if the mob or enemy is not dead or has greater than health and doesn't have any ForceField.
+                -- This while loop is checking if the mob or enemy is not dead or has greater than 0 health and doesn't have any ForceField. 
                 while humanoid.Health > 0 and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and not v:FindFirstChild("ForceField") and not v:FindFirstChild("ShieldForceField")  do
                     task.wait()
                     game:GetService("Players").LocalPlayer.Character:FindFirstChild("Torrent").RemoteFunction:InvokeServer(
