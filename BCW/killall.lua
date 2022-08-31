@@ -8,7 +8,7 @@ coroutine.wrap(function()
           pcall(function()
         for _, v in pairs(workspace:GetDescendants()) do
             -- Checking all GetDescendants if they have "EnemyMain" script.
-            if v:FindFirstChild("EnemyMain") then       
+            if v:FindFirstChild("EnemyMain") and not v:FindFirstChild("ForceField") and not v:FindFirstChild("ShieldForceField") then   
                 local humanoid = v:WaitForChild("Humanoid")
                 local Part = v:WaitForChild("HumanoidRootPart")	
                 -- This while loop is checking if the mob or enemy is not dead or has greater than 0 health and doesn't have any ForceField. 
