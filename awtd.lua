@@ -798,6 +798,20 @@ Tabs.Game:CreateToggle({
     end
 })
 
+local Macro_Playback = Tabs.Game:CreateToggle({
+    Name = "Macro Playback",
+    CurrentValue = JSON.macro_playback,
+    Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        JSON.macro_playback = Value
+        Save()
+
+        if Value then
+            task.spawn(MacroPlayback)
+        end
+    end
+})
+
 Tabs.Game:CreateToggle({
     Name = "Automatic 2x Speed",
     CurrentValue = JSON.auto_2x,
