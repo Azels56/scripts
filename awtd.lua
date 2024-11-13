@@ -1,4 +1,3 @@
-
 for _, v in pairs(getconnections(game.Players.LocalPlayer.Idled)) do
     v:Disable()
 end
@@ -10,7 +9,7 @@ until game.CoreGui:FindFirstChild("RobloxPromptGui")
 local po, ts = game.CoreGui.RobloxPromptGui.promptOverlay, game:GetService("TeleportService")
 
 local teleportOnFailed = po.ChildAdded:Connect(function(a)
-    if a.Name == "ErrorPrompt"  then
+    if a.Name == "ErrorPrompt" then
         repeat
             ts:Teleport(game.GameId)
             task.wait(1)
@@ -157,19 +156,19 @@ end
 if not isfolder("SapphireHub") then
     makefolder("SapphireHub")
 end
-if not isfolder("SapphireHub/Anime Vanguards") then
-    makefolder("SapphireHub/Anime Vanguards")
+if not isfolder("SapphireHub/Anime World Tower Defense") then
+    makefolder("SapphireHub/Anime World Tower Defense")
 end
-if not isfolder("SapphireHub/Anime Vanguards/Settings") then
-    makefolder("SapphireHub/Anime Vanguards/Settings")
+if not isfolder("SapphireHub/Anime World Tower Defense/Settings") then
+    makefolder("SapphireHub/Anime World Tower Defense/Settings")
 end
 
-local SettingsFile = "SapphireHub/Anime Vanguards/Settings/" .. game.Players.LocalPlayer.UserId .. ".json"
+local SettingsFile = "SapphireHub/Anime World Tower Defense/Settings/" .. game.Players.LocalPlayer.UserId .. ".json"
 local MacroDefaultSettings = {
     ["Default Profile"] = {}
 }
 local JSON, Macros, startTime, startTimeOffset
-local folder_name = "SapphireHub/Anime Vanguards/" .. game.Players.LocalPlayer.UserId
+local folder_name = "SapphireHub/Anime World Tower Defense/" .. game.Players.LocalPlayer.UserId
 
 if not pcall(function()
         readfile(SettingsFile)
@@ -240,12 +239,12 @@ function TPReturner()
     local actualHour = os.date("!*t").hour
     local File = pcall(function()
         AllIDs = game:GetService('HttpService'):JSONDecode(readfile(
-            "SapphireHub/Anime Vanguards/" ..
+            "SapphireHub/Anime World Tower Defense/" ..
             "NotSameServers.json"))
     end)
     if not File then
         table.insert(AllIDs, actualHour)
-        writefile("SapphireHub/Anime Vanguards/" ..
+        writefile("SapphireHub/Anime World Tower Defense/" ..
             "NotSameServers.json",
             game:GetService('HttpService'):JSONEncode(AllIDs))
     end
@@ -280,7 +279,8 @@ function TPReturner()
                 else
                     if tonumber(actualHour) ~= tonumber(Existing) then
                         local delFile = pcall(function()
-                            delfile("NotSameServers.json")
+                            delfile("SapphireHub/Anime World Tower Defense/" ..
+                                "NotSameServers.json")
                             AllIDs = {}
                             table.insert(AllIDs, actualHour)
                         end)
@@ -292,7 +292,8 @@ function TPReturner()
                 table.insert(AllIDs, ID)
                 task.wait()
                 pcall(function()
-                    writefile("NotSameServers.json",
+                    writefile("SapphireHub/Anime World Tower Defense/" ..
+                        "NotSameServers.json",
                         game:GetService('HttpService'):JSONEncode(AllIDs))
                     task.wait()
                     game:GetService("TeleportService"):TeleportToPlaceInstance(
@@ -313,53 +314,27 @@ function Teleport()
     end
 end
 
--- Original MacroPlayback function with added loop check
-function MacroPlayback()
-    if game.PlaceID == 6558526079 then return end
-
-    if workspace.StageSelect ~= nil then
-        local stageValue = workspace.StageSelect.Value
-
-        if tonumber(stageValue) then
-            stageValue = tonumber(stageValue)
-            local selectedWorld = getWorldByStage(stageValue, macroMapList)
-
-            if selectedWorld then
-                print("Selected stage:", stageValue)
-                print("The world is:", selectedWorld)
-
-                if JSON.Macro_Maps_Profile["Story"] and JSON.Macro_Maps_Profile["Story"][selectedWorld] then
-                    JSON.macro_profile = JSON.Macro_Maps_Profile["Story"][selectedWorld]
-                else
-                    print("World profile not found for:", selectedWorld)
-                end
-            else
-                print("World not found for the selected stage:", stageValue)
-            end
-        elseif table.find(macroMapList.Raid, stageValue) then
-            print("Selected Raid:", stageValue)
-            if JSON.Macro_Maps_Profile["Raid"] and JSON.Macro_Maps_Profile["Raid"][stageValue] then
-                JSON.macro_profile = JSON.Macro_Maps_Profile["Raid"][stageValue]
-            end
-        elseif table.find(macroMapList["Infinite"], stageValue) then
-            print("Selected Infinite:", stageValue)
-            if JSON.Macro_Maps_Profile["Infinite"] and JSON.Macro_Maps_Profile["Infinite"][stageValue] then
-                JSON.macro_profile = JSON.Macro_Maps_Profile["Infinite"][stageValue]
-            end
-        elseif table.find(macroMapList["Legend Stage"], stageValue) then
-            print("Selected Stage:", stageValue)
-            if JSON.Macro_Maps_Profile["legend_stage"] and JSON.Macro_Maps_Profile["legend_stage"][stageValue] then
-                JSON.macro_profile = JSON.Macro_Maps_Profile["legend_stage"][stageValue]
-            end
-        elseif table.find(macroMapList["Event"], stageValue) then
-            print("Selected Stage:", stageValue)
-            if JSON.Macro_Maps_Profile["EventStage"] and JSON.Macro_Maps_Profile["EventStage"][stageValue] then
-                JSON.macro_profile = JSON.Macro_Maps_Profile["EventStage"][stageValue]
-            end
-        end
-    else
-        print("StageSelect not found in workspace.")
+function StartAutomaticNextButton()
+    repeat wait() until game:GetService("Players").LocalPlayer.PlayerGui.EndUI.UI.CountDown.Text ~= "-"
+    if JSON.auto_join_increment_story and not JSON.auto_replay then
+        task.wait(2)
+        clickUI(game:GetService("Players").LocalPlayer.PlayerGui.EndUI.UI.NextStage)
+        JSON.auto_join_level = JSON.auto_join_level + 1
+        Save()
     end
+end
+
+function StartAutomaticReplayButton()
+    repeat wait() until game:GetService("Players").LocalPlayer.PlayerGui.EndUI.UI.CountDown.Text ~= "-"
+    if JSON.auto_replay and not JSON.auto_join_increment_story then
+        task.wait(2)
+        clickUI(game:GetService("Players").LocalPlayer.PlayerGui.EndUI.UI.Replay)
+    end
+end
+
+function MacroPlayback()
+    repeat task.wait() until game.Players.LocalPlayer.leaderstats:FindFirstChild("Cash") ~=
+    nil
 
     table.sort(Macros[JSON.macro_profile], function(a, b)
         return a[1] < b[1]
@@ -457,7 +432,6 @@ function TableToCFrame(cframeTable)
 
     return cframe
 end
-
 
 if game.PlaceId ~= 6558526079 then
     local game_metatable = getrawmetatable(game)
@@ -593,9 +567,6 @@ function JoinGame()
             end
         end
 
-        if JSON.auto_join_increment_story then
-            JSON.auto_join_increment_story = JSON.auto_join_increment_story + 1
-        end
     elseif JSON.auto_join_mode == "Endless" then
         if JSON.auto_join_endless_mode then
             args = {
@@ -628,7 +599,7 @@ function JoinGame()
             }
             game:GetService("ReplicatedStorage").Remote.CreateRoom:FireServer(unpack(args))
             task.wait(1)
-            clickUI(game.Players.LocalPlayer.PlayerGui.InRoomUi.RoomUI.QuickStart.TextButton)
+
             task.wait(60)
             if JSON.auto_join_game then
                 Teleport()
@@ -685,8 +656,61 @@ if not game.Workspace:FindFirstChild("PlayerPortal") then
     if JSON.auto_2x then
         task.spawn(AutomaticChangeSpeed)
     end
+
+    if workspace.StageSelect ~= nil then
+        local stageValue = workspace.StageSelect.Value
+
+        if tonumber(stageValue) then
+            stageValue = tonumber(stageValue)
+            local selectedWorld = getWorldByStage(stageValue, macroMapList)
+
+            if selectedWorld then
+                print("Selected stage:", stageValue)
+                print("The world is:", selectedWorld)
+
+                if JSON.Macro_Maps_Profile["Story"] and JSON.Macro_Maps_Profile["Story"][selectedWorld] then
+                    JSON.macro_profile = JSON.Macro_Maps_Profile["Story"][selectedWorld]
+                else
+                    print("World profile not found for:", selectedWorld)
+                end
+            else
+                print("World not found for the selected stage:", stageValue)
+            end
+        elseif table.find(macroMapList.Raid, stageValue) then
+            print("Selected Raid:", stageValue)
+            if JSON.Macro_Maps_Profile["Raid"] and JSON.Macro_Maps_Profile["Raid"][stageValue] then
+                JSON.macro_profile = JSON.Macro_Maps_Profile["Raid"][stageValue]
+            end
+        elseif table.find(macroMapList["Infinite"], stageValue) then
+            print("Selected Infinite:", stageValue)
+            if JSON.Macro_Maps_Profile["Infinite"] and JSON.Macro_Maps_Profile["Infinite"][stageValue] then
+                JSON.macro_profile = JSON.Macro_Maps_Profile["Infinite"][stageValue]
+            end
+        elseif table.find(macroMapList["Legend Stage"], stageValue) then
+            print("Selected Stage:", stageValue)
+            if JSON.Macro_Maps_Profile["legend_stage"] and JSON.Macro_Maps_Profile["legend_stage"][stageValue] then
+                JSON.macro_profile = JSON.Macro_Maps_Profile["legend_stage"][stageValue]
+            end
+        elseif table.find(macroMapList["Event"], stageValue) then
+            print("Selected Stage:", stageValue)
+            if JSON.Macro_Maps_Profile["EventStage"] and JSON.Macro_Maps_Profile["EventStage"][stageValue] then
+                JSON.macro_profile = JSON.Macro_Maps_Profile["EventStage"][stageValue]
+            end
+        end
+    else
+        print("StageSelect not found in workspace.")
+    end
+
     if JSON.macro_playback then
         task.spawn(MacroPlayback)
+    end
+
+    if JSON.auto_join_increment_story then
+        task.spawn(StartAutomaticNextButton)
+    end
+
+    if JSON.auto_replay then
+        task.spawn(StartAutomaticReplayButton)
     end
 
     if JSON.auto_start_game then
@@ -713,11 +737,11 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
     Name = "Sapphire Hub",
-    LoadingTitle = "Anime Vanguards",
+    LoadingTitle = "Anime World Tower Defense",
     LoadingSubtitle = "by saintfulls",
     ConfigurationSaving = {
         Enabled = false,
-        FolderName = "SapphireHub/Anime Vanguards/Settings/",
+        FolderName = "SapphireHub/Anime World Tower Defense/Settings/",
         FileName = game.Players.LocalPlayer.UserId .. ".json"
     },
     Discord = {
@@ -787,6 +811,8 @@ Tabs.Game:CreateToggle({
         end
     end
 })
+
+
 
 local Lobby_Main = Tabs.Lobby:CreateSection("Modes")
 
@@ -868,14 +894,31 @@ Tabs.Lobby:CreateDropdown({
 local Lobby_Second = Tabs.Lobby:CreateSection("Settings")
 
 Tabs.Lobby:CreateToggle({
-    Name = "Auto Next Story Level",
+    Name = "Auto Next Level",
     CurrentValue = JSON.auto_join_increment_story,
     Flag = "Toggle1",
     Callback = function(value)
         JSON.auto_join_increment_story = value
         Save()
+        if value then
+            task.spawn(StartAutomaticNextButton)
+        end
     end
 })
+
+Tabs.Lobby:CreateToggle({
+    Name = "Auto Replay",
+    CurrentValue = JSON.auto_replay,
+    Flag = "Toggle1",
+    Callback = function(value)
+        JSON.auto_replay = value
+        Save()
+        if value then
+            task.spawn(StartAutomaticReplayButton)
+        end
+    end
+})
+
 
 
 
@@ -1029,25 +1072,17 @@ local Macro_Record = Tabs.Macro:CreateToggle({
 local Macro_Playback = Tabs.Macro:CreateToggle({
     Name = "Macro Playback",
     CurrentValue = JSON.macro_playback,
-    Flag = "Toggle1", -- Ensure every element has a unique flag for configuration saving
+    Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
     Callback = function(Value)
         JSON.macro_playback = Value
         Save()
 
         if Value then
-            task.spawn(MacroPlaybackLoop)
+            task.spawn(MacroPlayback)
         end
     end
 })
 
--- Function to loop MacroPlayback while the toggle is enabled
-function MacroPlaybackLoop()
-    while JSON.macro_playback do
-        MacroPlayback()
-        task.wait(1) -- Adjust the wait time as needed
-    end
-    print("Macro Playback Stopped")
-end
 
 local profile_name = ""
 
@@ -1371,7 +1406,7 @@ for tabName, mapsList in pairs(macroMapList) do
                         Content = "Using " .. JSON.Macro_Maps_Profile["EventStage"][mapName],
                         Duration = 6.5,
                         Image = 4483362458,
-                        Actions = {   
+                        Actions = {
                             Ignore = {
                                 Name = "Okay!",
                                 Callback = function()
@@ -1389,10 +1424,25 @@ for tabName, mapsList in pairs(macroMapList) do
 end
 
 
-
 function clickUI(gui)
-    local VIM = game:GetService("VirtualInputManager")
-    for i = 1, 2 do
-        VIM:SendMouseButtonEvent(gui.AbsolutePosition.X + gui.AbsoluteSize.X / 2, gui.AbsolutePosition.Y, 0,({ true, false })[i], game, 1)
+    local UserInputService = game:GetService("UserInputService")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+
+    local GuiService = game:GetService("GuiService")
+    GuiService.SelectedObject = gui
+
+    local mousePosition = UserInputService:GetMouseLocation()
+
+    if gui.AbsolutePosition.X <= mousePosition.X and mousePosition.X <= gui.AbsolutePosition.X + gui.AbsoluteSize.X and
+        gui.AbsolutePosition.Y <= mousePosition.Y and mousePosition.Y <= gui.AbsolutePosition.Y + gui.AbsoluteSize.Y then
+        VirtualInputManager:SendMouseButtonEvent(mousePosition.X, mousePosition.Y, Enum.UserInputType.MouseButton1, true,
+            game)
+        task.wait(0.05)
+        VirtualInputManager:SendMouseButtonEvent(mousePosition.X, mousePosition.Y, Enum.UserInputType.MouseButton1, false,
+            game)
+    else
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+        task.wait(0.05)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
     end
 end
