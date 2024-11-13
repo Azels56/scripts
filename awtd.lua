@@ -26,7 +26,7 @@ local DefaultSettings = {
     macro_specialmove = true,
     macro_skipwave = true,
     macro_record = false,
-    macro_playback = false,
+    macro_playback = true,
     auto_join_game = false,
     auto_join_level = 1,
     auto_next_story = false,
@@ -1079,20 +1079,6 @@ local Macro_Record = Tabs.Macro:CreateToggle({
 
                 }
             })
-        end
-    end
-})
-
-local Macro_Playback = Tabs.Macro:CreateToggle({
-    Name = "Macro Playback",
-    CurrentValue = JSON.macro_playback,
-    Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-    Callback = function(Value)
-        JSON.macro_playback = Value
-        Save()
-
-        if Value then
-            task.spawn(MacroPlayback)
         end
     end
 })
