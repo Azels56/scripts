@@ -1072,16 +1072,25 @@ local Macro_Record = Tabs.Macro:CreateToggle({
 local Macro_Playback = Tabs.Macro:CreateToggle({
     Name = "Macro Playback",
     CurrentValue = JSON.macro_playback,
-    Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Flag = "Toggle1", -- Ensure every element has a unique flag for configuration saving
     Callback = function(Value)
         JSON.macro_playback = Value
         Save()
 
         if Value then
-            task.spawn(MacroPlayback)
+            task.spawn(MacroPlaybackLoop)
         end
     end
 })
+
+-- Function to loop MacroPlayback while the toggle is enabled
+function MacroPlaybackLoop()
+    while JSON.macro_playback do
+        MacroPlayback()
+        task.wait(1) -- Adjust the wait time as needed
+    end
+    print("Macro Playback Stopped")
+end
 
 
 local profile_name = ""
